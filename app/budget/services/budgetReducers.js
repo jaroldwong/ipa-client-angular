@@ -541,7 +541,8 @@ budgetApp.service('budgetReducers', function ($rootScope, $log, budgetSelectors)
 						isLineItemOpen: false,
 						isCourseCostOpen: false,
 						openLineItems: [],
-						selectedLineItems: [],
+						selectedLineItemIds: [],
+						selectedImplicitTeachingAssignmentIds: [],
 						lineItemDetails: {},
 						sectionGroupCostDetails: {},
 						selectedBudgetScenarioId: parseInt(action.selectedBudgetScenarioId),
@@ -573,6 +574,37 @@ budgetApp.service('budgetReducers', function ($rootScope, $log, budgetSelectors)
 					});
 
 					return ui;
+				case TOGGLE_SELECT_LINE_ITEM:
+				debugger;
+					var lineItemId = action.payload.lineItem.id;
+					var teachingAssignmentId = action.payload.lineItem.teachingAssignmentId;
+					if (lineItemId > 0) {
+						var index = ui.selectedLineItemIds.indexOf(lineItemId);
+						if (index == -1) {
+							ui.selectedLineItemIds.push(lineItemId);
+						} else {
+							ui.selectedLineItemIds.splice(index, 1);
+						}
+					} else {
+						var index = ui.selectedImplicitTeachingAssignmentIds.indexOf(teachingAssignmentId);
+						if (index == -1) {
+							ui.selectedImplicitTeachingAssignmentIds.push(teachingAssignmentId);
+						} else {
+							ui.selectedImplicitTeachingAssignmentIds.splice(index, 1);
+						}
+					}
+					ui.areAllLineItemsSelected = action.payload.areAllLineItemsSelected;
+					return lineItems;
+				case DESELECT_ALL_LINE_ITEMS:
+					ui.selectedLineItems = [];
+					ui.selectedImplicitLineItems = [];
+					ui.areAllLineItemsSelected = false;
+					return lineItems;
+				case SELECT_ALL_LINE_ITEMS:
+					ui.selectedLineItems = selectedLineItemIds;
+					ui.selectedImplicitLineItems = selectedImplicitLineItemTeachingAssistantIds;
+					ui.areAllLineItemsSelected = true;
+					return lineItems;
 				case CALCULATE_SCENARIO_TERMS:
 					ui.termNav.allTabs = action.payload.allTermTabs;
 					ui.termNav.activeTab = action.payload.activeTermTab;
@@ -612,28 +644,6 @@ budgetApp.service('budgetReducers', function ($rootScope, $log, budgetSelectors)
 					return ui;
 				case SET_ROUTE:
 					ui.sectionNav.activeTab = action.payload.selectedRoute;
-					return ui;
-				case TOGGLE_SELECT_LINE_ITEM:
-					var lineItemId = action.payload.lineItem.id;
-					var index = ui.selectedLineItems.indexOf(lineItemId);
-					if (index == -1) {
-						ui.selectedLineItems.push(lineItemId);
-					} else {
-						ui.selectedLineItems.splice(index, 1);
-						ui.areAllLineItemsSelected = false;
-					}
-					return ui;
-				case SELECT_ALL_LINE_ITEMS:
-					action.payload.lineItems.forEach(function(lineItem) {
-						if (ui.selectedLineItems.indexOf(lineItem.id) == -1) {
-							ui.selectedLineItems.push(lineItem.id);
-						}
-					});
-					ui.areAllLineItemsSelected = true;
-					return ui;
-				case DESELECT_ALL_LINE_ITEMS:
-					ui.selectedLineItems = [];
-					ui.areAllLineItemsSelected = false;
 					return ui;
 				case DELETE_LINE_ITEMS:
 					action.payload.lineItemIds.forEach(function(lineItemId) {

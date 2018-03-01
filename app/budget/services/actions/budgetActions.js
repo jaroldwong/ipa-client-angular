@@ -731,10 +731,17 @@ budgetApp.service('budgetActions', function ($rootScope, $window, budgetService,
 			});
 		},
 		toggleSelectLineItem: function(lineItem) {
+			var numberNotSelected = 0;
+			budgetReducers._state.lineItems.ids.forEach(function(lineItemId) {
+				var slotLineItem = budgetReducers._state.lineItems.list[lineItemId];
+				if (slotLineItem.selected == false || slotLineItem.selected == null) { numberNotSelected++; }
+			});
+
 			budgetReducers.reduce({
 				type: TOGGLE_SELECT_LINE_ITEM,
 				payload: {
-					lineItem: lineItem
+					lineItem: lineItem,
+					areAllLineItemsSelected: (numberNotSelected == 0)
 				}
 			});
 		},
